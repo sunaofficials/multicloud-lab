@@ -12,8 +12,7 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   # Note: enable_irsa = true MUST be removed. 
-  # It was deleted in v21. Pod Identities are now used by default.
-  # santanu managd eks
+  # It was
 
   eks_managed_node_groups = {
     default = {
