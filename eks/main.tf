@@ -8,25 +8,48 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-  # Public endpoint enabled (restricted later)
+  # Public endpoint enabled (can restrict CIDR later)
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
   enable_irsa = true
 }
 
-# Kubernetes provider (after cluster creation)
+# -------------------------
+# EKS Data Sources
+# -------------------------
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+# -------------------------
+# Helm Provider
+# -------------------------
+
 provider "helm" {
   kubernetes {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token                  = module.eks.cluster_auth_token
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(
+      data.aws_eks_cluster.cluster.certificate_authority[0].data
+    )
+    token = data.aws_eks_cluster_auth.cluster.token
   }
 }
 
+# -------------------------
+# Kubectl Provider
+# -------------------------
+
 provider "kubectl" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = module.eks.cluster_auth_token
-  load_config_file       = false
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(
+    data.aws_eks_cluster.cluster.certificate_authority[0].data
+  )
+  token            = data.aws_eks_cluster_auth.cluster.token
+  load_config_file = false
 }
