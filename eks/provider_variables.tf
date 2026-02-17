@@ -56,3 +56,10 @@ provider "aws" {
 data "aws_availability_zones" "available" {
   state = "available"
 }
+
+
+variable "node_instance_type" {
+  description = "Instance type for Karpenter nodes"
+  type        = string
+  default     = "t3.medium"
+}
