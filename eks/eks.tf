@@ -4,7 +4,7 @@ module "eks" {
 
   # The new v21 variable names:
   name                    = var.cluster_name
-  kubernetes_version      = "1.34"
+  kubernetes_version      = "1.32"
   endpoint_private_access = true
   endpoint_public_access  = false
 
@@ -22,7 +22,7 @@ module "eks" {
       max_size     = 3
       desired_size = 2
 
-      ami_type = "AL2_x86_64"
+      ami_type = "AL2023_x86_64_STANDARD"
     }
   }
 
